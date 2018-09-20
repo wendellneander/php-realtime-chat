@@ -1,28 +1,18 @@
 <?php
 
-use Ratchet\Http\HttpServer;
+namespace App\Classes;
+
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
-use Ratchet\Server\IoServer;
-use Ratchet\WebSocket\WsServer;
+use SplObjectStorage;
 
-// Make sure composer dependencies have been installed
-require __DIR__ . '/vendor/autoload.php';
-
-/**
- * chat.php
- * Send any incoming messages to all connected clients (except sender)
- */
 class Chat implements MessageComponentInterface {
     /** @var SplObjectStorage  */
     protected $clients;
 
-    /**
-     * SimpleChat constructor.
-     */
+
     public function __construct()
     {
-        // Iniciamos a coleção que irá armazenar os clientes conectados
         $this->clients = new \SplObjectStorage;
     }
 
@@ -33,7 +23,6 @@ class Chat implements MessageComponentInterface {
      */
     public function onOpen(ConnectionInterface $conn)
     {
-        // Adicionando o cliente na coleção
         $this->clients->attach($conn);
         echo "Cliente conectado ({$conn->resourceId})" . PHP_EOL;
     }
@@ -46,7 +35,6 @@ class Chat implements MessageComponentInterface {
      */
     public function onMessage(ConnectionInterface $from, $data)
     {
-        // Convertendo os dados recebidos para vetor e adicionando a data
         $data = json_decode($data) ?? new stdClass();
         $data->time = date('H:i - d M, Y');
 
@@ -87,14 +75,3 @@ class Chat implements MessageComponentInterface {
         echo "Ocorreu um erro: {$e->getMessage()}" . PHP_EOL;
     }
 }
-
-$server = IoServer::factory(
-    new HttpServer(
-        new WsServer(
-            new Chat()
-        )
-    ),
-    8080
-);
-
-$server->run();
