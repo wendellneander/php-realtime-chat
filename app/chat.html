@@ -69,8 +69,6 @@
 <script src="js/bootstrap.js"></script>
 <script>
 
-    Notification.requestPermission();
-
     var conn = new WebSocket('ws://localhost:8080');
 
     conn.onopen = function (e) {
@@ -80,15 +78,6 @@
     conn.onmessage = function (e) {
 
         var obj = JSON.parse(e.data);
-
-        var notification = new Notification("Você recebeu uma nova mensagem!", {
-            icon: 'http://i.stack.imgur.com/dmHl0.png',
-            body: obj.msg
-        });
-
-        notification.onclick = function() {
-            window.open("http://stackoverflow.com");
-        }
 
         console.log(obj);
 
