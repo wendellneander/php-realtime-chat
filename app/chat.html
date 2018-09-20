@@ -1,0 +1,131 @@
+<html>
+<head>
+    <link href="css/fontawesome.css" type="text/css" rel="stylesheet">
+    <link href="css/bootstrap.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container mt-5">
+
+    <div class="messaging">
+        <div class="inbox_msg">
+
+            <div class="inbox_people">
+                <div class="headind_srch">
+                    <div class="recent_heading">
+                        <h4>Recent</h4>
+                    </div>
+
+                    <div class="srch_bar">
+                        <div class="stylish-input-group">
+                            <input type="text" class="search-bar" placeholder="Search">
+                            <span class="input-group-addon">
+                                <button type="button"> <i class="fa fa-search" aria-hidden="true"></i> </button>
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="inbox_chat">
+
+                    <div class="chat_list active_chat">
+                        <div class="chat_people">
+                            <div class="chat_img"><img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"></div>
+                            <div class="chat_ib">
+                                <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
+                                <p>Test, which is a new approach to have all solutions astrology under one roof.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="mesgs" style="padding-bottom: 16px">
+
+                <div class="msg_history"></div>
+
+                <div class="type_msg">
+
+                    <div class="input_msg_write">
+
+                        <textarea style="margin-top: 16px;" id="msg" class="write_msg form-control" placeholder="Type a message"></textarea>
+                        <button style="margin-right: 12px; margin-top: 16px;" onclick="addMsg()" class="msg_send_btn" type="button"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<script src="js/jquery.js"></script>
+<script src="js/moment.js"></script>
+<script src="js/bootstrap.js"></script>
+<script>
+
+    Notification.requestPermission();
+
+    var conn = new WebSocket('ws://localhost:8080');
+
+    conn.onopen = function (e) {
+        console.log("Connection established!");
+    };
+
+    conn.onmessage = function (e) {
+
+        var obj = JSON.parse(e.data);
+
+        var notification = new Notification("Você recebeu uma nova mensagem!", {
+            icon: 'http://i.stack.imgur.com/dmHl0.png',
+            body: obj.msg
+        });
+
+        notification.onclick = function() {
+            window.open("http://stackoverflow.com");
+        }
+
+        console.log(obj);
+
+        var incommingMsgHtml = '<div class="incoming_msg">' +
+            '     <div class="incoming_msg_img">' +
+            '         <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil">' +
+            '     </div>' +
+            '     <div class="received_msg">' +
+            '         <div class="received_withd_msg">' +
+            '             <p>' + obj.msg + '</p>' +
+            '             <span class="time_date">'+ obj.time +'</span>' +
+            '         </div>' +
+            '     </div>' +
+            ' </div>';
+
+        $(".msg_history").append(incommingMsgHtml);
+    };
+
+
+
+    function addMsg(){
+        var text = $("#msg").val();
+
+        if(text){
+            var htmlMsg = '<div class="outgoing_msg">' +
+                '<div class="sent_msg">' +
+                '<p>' + text + '</p>' +
+                '<span class="time_date">'+ moment().format('H:ss - D MMM, YYYY') +'</span>' +
+                '</div>' +
+                '</div>';
+
+            conn.send('{"msg" : "' + text + '"}');
+
+            $(".msg_history").append(htmlMsg);
+            $("#msg").val('')
+        }
+    }
+</script>
+</body>
+</html>
